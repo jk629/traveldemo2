@@ -1,134 +1,123 @@
 <template>
   <div>
-      <h1>
-      <span>旅游申请管理</span>
-    </h1>
     <div class="island">
       <h3>
         <span>旅游申请一览</span>
       </h3>
       <div>
-        <button type="button" id="button_1">
-          <span>新建申请</span>
-        </button>
+        <a-button type="primary" @click="showDrawer"><a-icon type="plus"/>新建申请</a-button>
       </div>
-      <table id="table">
-        <thead>
-          <th>状态</th>
-          <th>部门</th>
-          <th>组别</th>
-          <th>识别ID</th>
-          <th>人数</th>
-          <th>申请日</th>
-          <th>申请人</th>
-          <th>审批日</th>
-          <th>审批人</th>
-          <th>备注</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <span>待审批</span>
-            </td>
-            <td>
-              <span>D1</span>
-            </td>
-            <td>
-              <span>T1</span>
-            </td>
-            <td>
-              <a href="#">
-                <span>00000015</span>
-              </a>
-            </td>
-            <td>
-              <span>10</span>
-            </td>
-            <td>
-              <span>2020-07-05</span>
-            </td>
-            <td>
-              <span>张三</span>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>
-              <span>已审批</span>
-            </td>
-            <td>
-              <span>D1</span>
-            </td>
-            <td>
-              <span>T2</span>
-            </td>
-            <td>
-              <a href="#">
-                <span>00000013</span>
-              </a>
-            </td>
-            <td>
-              <span>8</span>
-            </td>
-            <td>
-              <span>2020-07-15</span>
-            </td>
-            <td>
-              <span>张四</span>
-            </td>
-            <td>
-              <span>2020-07-18</span>
-            </td>
-            <td>
-              <span>李三</span>
-            </td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>
-              <span>终了</span>
-            </td>
-            <td>
-              <span>D1</span>
-            </td>
-            <td>
-              <span>T1</span>
-            </td>
-            <td>
-              <a href="#">
-                <span>00000005</span>
-              </a>
-            </td>
-            <td>
-              <span>9</span>
-            </td>
-            <td>
-              <span>2020-07-20</span>
-            </td>
-            <td>
-              <span>张四</span>
-            </td>
-            <td>
-              <span>2020-07-21</span>
-            </td>
-            <td>
-              <span>李三</span>
-            </td>
-            <td>无</td>
-          </tr>
-        </tbody>
-      </table>
+      <a-drawer
+      title="Create a new account"
+      :width="720"
+      :visible="visible"
+      :body-style="{ paddingBottom: '80px' }"
+      @close="onClose"
+    >
+    <detail/>
+      </a-drawer>
+      <a-table
+        :columns="tableData.columns"
+        :data-source="tableData.dateSource"
+        :rowKey="record=>record.id"
+      >
+        <a slot="link" slot-scope="id" @click="handleEdit(id)">{{id}}</a>
+      </a-table>
     </div>
   </div>
 </template>
 
 <script>
+import detail from './detail'
+// table
+var tableData = {
+  columns: [
+    {
+      title: "状态",
+      dataIndex: "status",
+    },
+    {
+      title: "部门",
+      dataIndex: "department",
+    },
+    {
+      title: "识别ID",
+      dataIndex: "id",
+      scopedSlots: { customRender: "link" },
+    },
+    {
+      title: "人数",
+      dataIndex: "count",
+    },
+    {
+      title: "申请日",
+      dataIndex: "applydate",
+    },
+    {
+      title: "申请人",
+      dataIndex: "applicant",
+    },
+    {
+      title: "审批日",
+      dataIndex: "approvedate",
+    },
+    {
+      title: "审批人",
+      dataIndex: "approver",
+    },
+    {
+      title: "备注",
+      dataIndex: "remaks",
+    },
+  ],
+  dateSource: [
+    {
+      status: "终了",
+      department: "D1",
+      id: "1000001",
+      count: "10",
+      applydate: "2019-11-30",
+      applicant: "张三",
+      approvedate: "2019-12-03",
+      approver: "李四",
+      remaks: "同意",
+    },
+    {
+      status: "待审批",
+      department: "D2",
+      id: "1000004",
+      count: "15",
+      applydate: "2019-11-15",
+      applicant: "王五",
+      approvedate: "2019-12-10",
+      approver: "朱六",
+      remaks: "",
+    },
+  ],
+};
 export default {
-  name: "branchVue",
+  name: "branch",
   props: {
-    msg: String,
+  },
+  components: {
+    detail
+  },
+  data() {
+    return {
+            tableData,
+            visible:false,
+    }
+  },
+  methods: {
+    handleEdit(key) {
+      console.log(key + "!!!!!!!!!");
+    },
+    showDrawer() {
+      this.visible = true;
+    },
+    onClose() {
+      this.visible = false;
+    },
   },
 };
 </script>

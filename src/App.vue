@@ -1,73 +1,72 @@
 <template>
-  <div id="app">
-    <a-button-group>
-    <a-button @click="userChange('admin')">admin </a-button>
-    <a-button @click="userChange('branch')">branch </a-button>
-    <a-button @click="userChange('employee')">employee </a-button>
-    </a-button-group>
-    <div v-if="usertype == 'admin'"><admin/></div>
-    <div v-else-if="usertype == 'branch'"><branch/></div>
-    <div v-else-if="usertype == 'employee'"><employee/></div>
-  </div>
+  <a-layout id="components-layout-demo-custom-trigger">
+    <a-layout-sider v-model="collapsed" :trigger="null" collapsible>
+      <div class="logo" />
+      <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
+        <a-menu-item key="1">
+          <a-icon type="user" />
+          <span>nav 1</span>
+        </a-menu-item>
+        <a-menu-item key="2">
+          <a-icon type="video-camera" />
+          <span>nav 2</span>
+        </a-menu-item>
+        <a-menu-item key="3">
+          <a-icon type="upload" />
+          <span>nav 3</span>
+        </a-menu-item>
+      </a-menu>
+    </a-layout-sider>
+    <a-layout>
+      <a-layout-header style="background: #fff; padding: 0">
+        <a-icon
+          class="trigger"
+          :type="collapsed ? 'menu-unfold' : 'menu-fold'"
+          @click="() => (collapsed = !collapsed)"
+        />
+        <span>NEC软件（济南）有限公司 旅游管理系统</span>
+      </a-layout-header>
+      <a-layout-content
+        :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }"
+      >
+      <summary_vue/>
+      </a-layout-content>
+    </a-layout>
+  </a-layout>
 </template>
 
 <script>
-import admin from "./components/admin.vue";
-import branch from "./components/branch.vue";
-import employee from "./components/employee.vue";
+import summary_vue from "./components/summary.vue";
 export default {
   name: "App",
   components: {
-    admin,
-    branch,
-    employee
+    summary_vue
   },
   data() {
     return {
-      usertype :"admin"
-    }
+      collapsed: false,
+    };
   },
-  methods:{
-    userChange : function(val) {
-         this.usertype = val;
-    }
-  }
 };
 </script>
 
 <style>
-body {
-  margin: 100px 100px;
+#components-layout-demo-custom-trigger .trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
 }
-table {
-  border: black 1px solid;
-  width: 100%;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+
+#components-layout-demo-custom-trigger .trigger:hover {
+  color: #1890ff;
 }
-.island {
-  border-bottom: black 1px solid;
-  margin-bottom: 20px;
-}
-table input,
-select {
-  width: 50%;
-}
-.search {
-  display: flex;
-  justify-content: space-between;
-}
-.search input {
-  width: 100%;
-  margin: 20px 150px;
-  padding: 10px 100px;
-}
-tr > th {
-  border: black 1px solid;
-}
-tr > td {
-  border: gray 1px solid;
-  padding: 10px;
+
+#components-layout-demo-custom-trigger .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
 }
 </style>
+

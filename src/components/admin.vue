@@ -1,128 +1,229 @@
 <template>
-  <div>
-            <h1><span>旅游申请管理</span></h1>
-            <form>
-                <div class="island">
-                    <table id="table_1">
-                        <tr>
-                            <th><span>部门</span></th>
-                            <td><select id="select_1">
-                                <option value="0"></option>
-                                <option value="1">D1</option>
-                                <option value="2">D2</option>
-                            </select></td>
-                        </tr>
-                        <tr>
-                            <th><span>组别</span></th>
-                            <td><select id="select_2">
-                                <option value="0">T1</option>
-                                <option value="1">T2</option>
-                            </select></td>
-                        </tr>
-                        <tr>
-                            <th><span>状态</span></th>
-                            <td><select id="select_3">
-                                <option value="0">所有</option>
-                                <option value="1">待审批</option>
-                                <option value="2">已审批</option>
-                                <option value="3">终了</option>
-                            </select></td>
-                        </tr>
-                        <tr>
-                            <th><span>申请日</span></th>
-                            <td><input type="date" id="date_1"/></td>
-                        </tr>
-                        <tr>
-                            <th><span>审批日</span></th>
-                            <td><input type="date" id="date_2"/></td>
-                        </tr>
-                        <tr>
-                            <th><span>识别ID</span></th>
-                            <td><input type="number" id="text_1"/></td>
-                        </tr>
-                    </table>
-                    <div class="search">
-                        <input type="button" value="检索">
-                        <input type="reset" value="重置">
-                    </div>
-                </div>
-                <div class="island">
-                    <h3><span>旅游申请一览</span></h3>
-                    <div>
-                        <button type="button" id="button_1"><span>批准</span></button>
-                        <button type="button" id="button_2"><span>驳回</span></button>
-                    </div>
-                    <table id="table">
-                        <thead>
-                            <th></th>
-                            <th>状态</th>
-                            <th>部门</th>
-                            <th>组别</th>
-                            <th>识别ID</th>
-                            <th>人数</th>
-                            <th>申请日</th>
-                            <th>申请人</th>
-                            <th>审批日</th>
-                            <th>审批人</th>
-                            <th>备注</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox" value="详细" id="checkbox_1" ></td>
-                                <td><span>待审批</span></td>
-                                <td><span>D1</span></td>
-                                <td><span>T1</span></td>
-                                <td><a href="#"><span>00000015</span></a></td>
-                                <td><span>10</span></td>
-                                <td><span>2020-07-05</span></td>
-                                <td><span>张三</span></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox" value="详细" id="checkbox_1" ></td>
-                                <td><span>已审批</span></td>
-                                <td><span>D1</span></td>
-                                <td><span>T2</span></td>
-                                <td><a href="#"><span>00000013</span></a></td>
-                                <td><span>8</span></td>
-                                <td><span>2020-07-15</span></td>
-                                <td><span>张四</span></td>
-                                <td><span>2020-07-18</span></td>
-                                <td><span>李三</span></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><span>终了</span></td>
-                                <td><span>D2</span></td>
-                                <td><span>T1</span></td>
-                                <td><a href="#"><span>00000005</span></a></td>
-                                <td><span>9</span></td>
-                                <td><span>2020-07-20</span></td>
-                                <td><span>张四</span></td>
-                                <td><span>2020-07-21</span></td>
-                                <td><span>李三</span></td>
-                                <td>无</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </form>
-        </div>
+  <a-form :form="form" @submit="handleSubmit">
+    <h1><span>旅游申请管理</span></h1>
+    <a-form-item label="部门&组别">
+      <a-cascader
+        style="width:20%"
+        v-decorator="[
+          'residence',
+          {
+            initialValue: ['ALL', '', ''],
+            rules: [
+              { type: 'array', message: 'xxxxxxxxxxxxxx!' },
+            ],
+          },
+        ]"
+        :options="residences"
+      />
+    </a-form-item>
+    <a-form-item label="状态">
+      <a-select default-value="ALL" style="width:20%">
+        <a-select-option value="0">ALL</a-select-option>
+        <a-select-option value="1">待审批</a-select-option>
+        <a-select-option value="2">已审批</a-select-option>
+        <a-select-option value="3">终了</a-select-option>
+      </a-select>
+    </a-form-item>
+    <a-form-item label="申请日">
+      <a-date-picker />
+    </a-form-item>
+    <a-form-item label="审批日">
+      <a-date-picker />
+    </a-form-item>
+    <a-form-item label="识别ID">
+      <a-input-number :min="1000000" :max="9999999" :step="1" style="width:20%" />
+    </a-form-item>
+    <a-form-item>
+      <a-space size="large">
+        <a-button type="primary">检索</a-button>
+        <a-button type="reset">重置</a-button>
+      </a-space>
+    </a-form-item>
+    <div class="island">
+      <h3>
+        <span>旅游申请一览</span>
+      </h3>
+    </div>
+    <div class="island">
+      <div style="margin-bottom: 16px">
+        <a-space size="large">
+          <a-button :disabled="!hasSelected">批准</a-button>
+          <a-button :disabled="!hasSelected">驳回</a-button>
+        </a-space>
+        <span style="margin-left: 8px">
+          <template v-if="hasSelected">{{ `Selected ${selectedRowKeys.length} items` }}</template>
+        </span>
+      </div>
+      <a-table
+        :row-selection="{ selectedRowKeys : selectedRowKeys , onChange: onSelectChange }"
+        :columns="tableData.columns"
+        :data-source="tableData.dateSource"
+        :rowKey="record=>record.id"
+      >
+        <a slot="link" slot-scope="id" @click="handleEdit(id)">{{id}}</a>
+      </a-table>
+    </div>
+  </a-form>
 </template>
 
 <script>
+// selection
+const residences = [
+  {
+    value: "ALL",
+    label: "ALL",
+  },
+  {
+    value: "0",
+    label: "D1",
+    children: [
+      {
+        value: "01",
+        label: "T1",
+      },
+      {
+        value: "02",
+        label: "T2",
+      },
+    ],
+  },
+  {
+    value: "1",
+    label: "D2",
+    children: [
+      {
+        value: "03",
+        label: "T3",
+      },
+    ],
+  },
+];
+// table
+var tableData = {
+  columns: [
+    {
+      title: "状态",
+      dataIndex: "status",
+    },
+    {
+      title: "部门",
+      dataIndex: "department",
+    },
+    {
+      title: "识别ID",
+      dataIndex: "id",
+      scopedSlots: { customRender: "link" },
+    },
+    {
+      title: "人数",
+      dataIndex: "count",
+    },
+    {
+      title: "申请日",
+      dataIndex: "applydate",
+    },
+    {
+      title: "申请人",
+      dataIndex: "applicant",
+    },
+    {
+      title: "审批日",
+      dataIndex: "approvedate",
+    },
+    {
+      title: "审批人",
+      dataIndex: "approver",
+    },
+    {
+      title: "备注",
+      dataIndex: "remaks",
+    },
+  ],
+  dateSource: [
+    {
+      checked: false,
+      status: "终了",
+      department: "D1",
+      id: "1000001",
+      count: "10",
+      applydate: "2019-11-30",
+      applicant: "张三",
+      approvedate: "2019-12-03",
+      approver: "李四",
+      remaks: "同意",
+    },
+    {
+      checked: false,
+      status: "待审批",
+      department: "D2",
+      id: "1000004",
+      count: "15",
+      applydate: "2019-11-15",
+      applicant: "王五",
+      approvedate: "2019-12-10",
+      approver: "朱六",
+      remaks: "",
+    },
+  ],
+};
+
 export default {
-  name: "adminVue",
-  props: {
-    msg: String,
+  name: "admin",
+  props: {},
+  data() {
+    return {
+      residences,
+      // formItemLayout: {
+      //   labelCol: {
+      //     xs: { span: 24 },
+      //     sm: { span: 8 },
+      //   },
+      //   wrapperCol: {
+      //     xs: { span: 24 },
+      //     sm: { span: 16 },
+      //   },
+      // },
+      tableData,
+      loading: false,
+      selectedRowKeys: [],
+    };
+  },
+  beforeCreate() {
+    this.form = this.$form.createForm(this, { name: "search" });
+  },
+  computed: {
+    hasSelected() {
+      return this.selectedRowKeys.length > 0;
+    },
+  },
+  methods: {
+    start() {
+      //   this.loading = true;
+      //   // ajax request after empty completing
+      //   setTimeout(() => {
+      //     this.loading = false;
+      //     this.tableData.selectedRowKeys = [];
+      //   }, 1000);
+    },
+    onSelectChange(selectedRowKeys) {
+      console.log("selectedRowKeys changed: ", selectedRowKeys);
+      this.selectedRowKeys = selectedRowKeys;
+    },
+    handleSubmit(e) {
+      e.preventDefault();
+      this.form.validateFieldsAndScroll((err, values) => {
+        if (!err) {
+          console.log("Received values of form: ", values);
+        }
+      });
+    },
+    handleEdit(key) {
+      console.log(key + "!!!!!!!!!");
+    },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>
