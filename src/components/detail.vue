@@ -1,122 +1,135 @@
 <template>
-  <div>
-    <a-form :form="form" layout="vertical" hide-required-mark>
-      <a-row :gutter="16">
-        <a-col :span="12">
-          <a-form-item label="Name">
-            <a-input
-              v-decorator="[
-                  'name',
+  <a-drawer
+    title="旅游情报"
+    :width="720"
+    :visible="visible"
+    :body-style="{ paddingBottom: '80px' }"
+    @close="onClose"
+  >
+    <div>
+      <a-form :form="form" layout="vertical" :hide-required-mark="isHideRequired">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="部门&组别">
+              <a-cascader
+                :options="residences"
+                v-decorator="[
+                  'department',
                   {
-                    rules: [{ required: true, message: 'Please enter user name' }],
+                    initialValue:department,
+                    rules: [{ required: true, message: 'Please select a department' }],
                   },
                 ]"
-              placeholder="Please enter user name"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="Url">
-            <a-input
-              v-decorator="[
-                  'url',
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="旅游开始日">
+              <a-date-picker
+                v-decorator="[
+                  'travelstartday',
                   {
-                    rules: [{ required: true, message: 'please enter url' }],
+                    initialValue:travelstartday,
+                    rules: [{ required: true, message: 'Please select a department' }],
                   },
                 ]"
-              style="width: 100%"
-              addon-before="http://"
-              addon-after=".com"
-              placeholder="please enter url"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="12">
-          <a-form-item label="Owner">
-            <a-select
-              v-decorator="[
-                  'owner',
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="旅游结束日">
+              <a-date-picker
+                v-decorator="[
+                  'travelendday',
                   {
-                    rules: [{ required: true, message: 'Please select an owner' }],
+                    initialValue:travelendday,
+                    rules: [{ required: true, message: 'Please select a department' }],
                   },
                 ]"
-              placeholder="Please a-s an owner"
-            >
-              <a-select-option value="xiao">Xiaoxiao Fu</a-select-option>
-              <a-select-option value="mao">Maomao Zhou</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="Type">
-            <a-select
-              v-decorator="[
-                  'type',
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="目的地">
+              <a-space size="large">
+                <a-cascader
+                  :options="district"
+                  @change="onChangeDistrict"
+                  v-decorator="[
+                  'destination',
                   {
-                    rules: [{ required: true, message: 'Please choose the type' }],
+                    initialValue:destination,
+                    rules: [{ required: true, message: 'Please select a destination' }],
                   },
                 ]"
-              placeholder="Please choose the type"
-            >
-              <a-select-option value="private">Private</a-select-option>
-              <a-select-option value="public">Public</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="12">
-          <a-form-item label="Approver">
-            <a-select
-              v-decorator="[
-                  'approver',
+                >
+                  <a href="#">选择</a>
+                </a-cascader>
+                {{ destinationStr }} &nbsp;
+              </a-space>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="人数">
+              <a-space size="large">
+                <a-input-number
+                  v-decorator="[
+                  'count',
                   {
-                    rules: [{ required: true, message: 'Please choose the approver' }],
+                    initialValue:count,
+                    rules: [{ required: true, message: 'Please input a number' }],
                   },
                 ]"
-              placeholder="Please choose the approver"
-            >
-              <a-select-option value="jack">Jack Ma</a-select-option>
-              <a-select-option value="tom">Tom Liu</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="DateTime">
-            <a-date-picker
-              v-decorator="[
-                  'dateTime',
+                />
+                <a-button>详细</a-button>
+              </a-space>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="预算">
+              <a-space size="large">
+                <a-input-number
+                  v-decorator="[
+                  'amount',
                   {
-                    rules: [{ required: true, message: 'Please choose the dateTime' }],
+                    initialValue:amount,
+                    rules: [{ required: true, message: 'Please input a number' }],
                   },
                 ]"
-              style="width: 100%"
-              :get-popup-container="trigger => trigger.parentNode"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="24">
-          <a-form-item label="Description">
-            <a-textarea
-              v-decorator="[
-                  'description',
+                />
+                {{amount}} $
+              </a-space>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="备注">
+              <a-textarea
+                v-decorator="[
+                  'remaks',
                   {
-                    rules: [{ required: true, message: 'Please enter url description' }],
+                    initialValue:remaks,
+                    rules: [{ required: true, message: 'Please enter something' }],
                   },
                 ]"
-              :rows="4"
-              placeholder="please enter url description"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-    <div
-      :style="{
+                :rows="4"
+                placeholder="please enter url description"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+      <div
+        :style="{
           position: 'absolute',
           right: 0,
           bottom: 0,
@@ -127,21 +140,151 @@
           textAlign: 'right',
           zIndex: 1,
         }"
-    >
-      <a-button :style="{ marginRight: '8px' }" @click="onClose">Cancel</a-button>
-      <a-button type="primary" @click="onClose">Submit</a-button>
+      >
+        <a-space size="large">
+          <a-button @click="onClose" size="large">Cancel</a-button>
+          <a-button type="primary" size="large" @click="onSave">save</a-button>
+        </a-space>
+      </div>
     </div>
-  </div>
+  </a-drawer>
 </template>
 <script>
+// selection
+const residences = [
+  {
+    value: "0",
+    label: "D1",
+    children: [
+      {
+        value: "01",
+        label: "T1",
+      },
+      {
+        value: "02",
+        label: "T2",
+      },
+    ],
+  },
+  {
+    value: "1",
+    label: "D2",
+    children: [
+      {
+        value: "03",
+        label: "T3",
+      },
+    ],
+  },
+];
+const district = [
+  {
+    value: "0",
+    label: "国内",
+    children: [
+      {
+        value: "01",
+        label: "北京",
+      },
+      {
+        value: "02",
+        label: "上海",
+      },
+      {
+        value: "03",
+        label: "山东",
+        children: [
+          {
+            value: "030",
+            label: "济南",
+          },
+          {
+            value: "031",
+            label: "青岛",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    value: "1",
+    label: "国外",
+    children: [
+      {
+        value: "10",
+        label: "日本",
+        children: [
+          {
+            value: "100",
+            label: "东京",
+          },
+          {
+            value: "101",
+            label: "北海道",
+            children: [
+              {
+                value: "1010",
+                label: "x1",
+              },
+              {
+                value: "1011",
+                label: "x2",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
 export default {
   name: "detail",
+  props: [
+    "visible",
+    "datasource",
+    "department",
+    "travelstartday",
+    "travelendday",
+    "destination",
+    "count",
+    "amount",
+    "remaks",
+    "index",
+  ],
   data() {
     return {
       form: this.$form.createForm(this),
+      residences,
+      district,
+      destinationStr: "",
+      isHideRequired: true,
+      cdatasource: this.datasource,
+      indexValue: this.index,
     };
   },
   methods: {
+    onClose() {
+      console.log("index!!!" + this.indexValue);
+      this.$emit("closeDrawer");
+    },
+    onSave() {
+      let data = {
+        departmentid: this.form.getFieldValue("department"),
+        // department: this.form.getFieldLabel("department"),
+        travelstartday: this.form.getFieldValue("travelstartday"),
+        travelendday: this.form.getFieldValue("travelendday"),
+        destination: this.form.getFieldValue("destination"),
+        count: this.form.getFieldValue("count"),
+        amount: this.form.getFieldValue("amount"),
+        remaks: this.form.getFieldValue("remaks"),
+      };
+      this.$emit("submitDrawer", data, this.index);
+      // console.log("form" + this.form.getFieldValue("destination"));
+      this.onClose();
+    },
+    onChangeDistrict(value, selectedOptions) {
+      this.destinationStr = selectedOptions.map((o) => o.label).join(", ");
+    },
   },
 };
 </script>
