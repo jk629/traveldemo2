@@ -13,11 +13,13 @@
             <a-form-item label="部门&组别">
               <a-cascader
                 :options="residences"
+                :allowClear="false"
+                :disabled="userType"
+                @change="onChangeDepartment"
                 v-decorator="[
                   'department',
-                  {
+                  { 
                     initialValue:department,
-                    rules: [{ required: true, message: 'Please select a department' }],
                   },
                 ]"
               />
@@ -32,9 +34,10 @@
                   'travelstartday',
                   {
                     initialValue:travelstartday,
-                    rules: [{ required: true, message: 'Please select a department' }],
+                    rules: [{ required: true, message: 'Please select a travelstartday' }],
                   },
                 ]"
+                :disabled="userType"
               />
             </a-form-item>
           </a-col>
@@ -45,9 +48,10 @@
                   'travelendday',
                   {
                     initialValue:travelendday,
-                    rules: [{ required: true, message: 'Please select a department' }],
+                    rules: [{ required: true, message: 'Please select a travelendday' }],
                   },
                 ]"
+                :disabled="userType"
               />
             </a-form-item>
           </a-col>
@@ -66,8 +70,9 @@
                     rules: [{ required: true, message: 'Please select a destination' }],
                   },
                 ]"
+                  :disabled="userType"
                 >
-                  <a href="#">选择</a>
+                  <a href="#" :disabled="userType">选择</a>
                 </a-cascader>
                 {{ destinationStr }} &nbsp;
               </a-space>
@@ -78,16 +83,8 @@
           <a-col :span="24">
             <a-form-item label="人数">
               <a-space size="large">
-                <a-input-number
-                  v-decorator="[
-                  'count',
-                  {
-                    initialValue:count,
-                    rules: [{ required: true, message: 'Please input a number' }],
-                  },
-                ]"
-                />
-                <a-button>详细</a-button>
+                {{totalCount}}
+                <a-button @click="showModal" :disabled="userType">详细</a-button>
               </a-space>
             </a-form-item>
           </a-col>
@@ -104,6 +101,7 @@
                     rules: [{ required: true, message: 'Please input a number' }],
                   },
                 ]"
+                  :disabled="userType"
                 />
                 {{amount}} $
               </a-space>
@@ -121,6 +119,7 @@
                     rules: [{ required: true, message: 'Please enter something' }],
                   },
                 ]"
+                :disabled="userType"
                 :rows="4"
                 placeholder="please enter url description"
               />
@@ -143,9 +142,17 @@
       >
         <a-space size="large">
           <a-button @click="onClose" size="large">Cancel</a-button>
-          <a-button type="primary" size="large" @click="onSave">save</a-button>
+          <a-button type="primary" size="large" @click="onSave" :disabled="userType">save</a-button>
         </a-space>
       </div>
+      <a-modal title="员工信息" :visible="isModal" @ok="handleOk" @cancel="handleCancel">
+        <a-table
+          :row-selection="{ selectedRowKeys : selectedRowKeys , onChange: onSelectChange }"
+          :columns="columns"
+          :data-source="dateSource"
+          :rowKey="record=>record.index"
+        ></a-table>
+      </a-modal>
     </div>
   </a-drawer>
 </template>
@@ -237,12 +244,62 @@ const district = [
     ],
   },
 ];
+// table
+var columns = [
+  {
+    title: "员工ID",
+    dataIndex: "id",
+  },
+  {
+    title: "员工姓名",
+    dataIndex: "name",
+  },
+  {
+    title: "家属",
+    dataIndex: "fanmily",
+  },
+  {
+    title: "人数",
+    dataIndex: "count",
+  },
+  {
+    title: "备注",
+    dataIndex: "remaks",
+  },
+];
+var dateSource = [
+  {
+    index: 0,
+    id: "000001",
+    count: "1",
+    name: "张三",
+    fanmily: "",
+    remaks: "",
+  },
+  {
+    index: 1,
+    id: "000002",
+    count: "3",
+    name: "李四",
+    fanmily: "有",
+    remaks: "小孩",
+  },
+  {
+    index: 2,
+    id: "000003",
+    count: "5",
+    name: "王五",
+    fanmily: "有",
+    remaks: "小孩和老人",
+  },
+];
 export default {
   name: "detail",
   props: [
     "visible",
     "datasource",
     "department",
+    "departmentlb",
     "travelstartday",
     "travelendday",
     "destination",
@@ -250,6 +307,7 @@ export default {
     "amount",
     "remaks",
     "index",
+    "userType",
   ],
   data() {
     return {
@@ -257,33 +315,65 @@ export default {
       residences,
       district,
       destinationStr: "",
+      departmentStr: "",
       isHideRequired: true,
-      cdatasource: this.datasource,
-      indexValue: this.index,
+      isModal: false,
+      dateSource,
+      columns,
+      selectedRowKeys: [],
+      totalCount: 0,
     };
+  },
+  computed: {
+    hasSelected() {
+      return this.selectedRowKeys.length > 0;
+    },
   },
   methods: {
     onClose() {
-      console.log("index!!!" + this.indexValue);
+      console.log("index!!!" + this.index);
       this.$emit("closeDrawer");
     },
+    onSelectChange(selectedRowKeys) {
+      console.log("selectedRowKeys changed: ", selectedRowKeys);
+      this.selectedRowKeys = selectedRowKeys;
+    },
     onSave() {
+      this.form.validateFieldsAndScroll((err, values) => {
+        if (!err) {
+          console.log("Received values of form: ", values);
+        }
+      });
       let data = {
+        index: this.index,
         departmentid: this.form.getFieldValue("department"),
-        // department: this.form.getFieldLabel("department"),
+        department: this.departmentStr ? this.departmentStr : this.departmentlb,
         travelstartday: this.form.getFieldValue("travelstartday"),
         travelendday: this.form.getFieldValue("travelendday"),
         destination: this.form.getFieldValue("destination"),
-        count: this.form.getFieldValue("count"),
+        count: this.totalCount,
         amount: this.form.getFieldValue("amount"),
         remaks: this.form.getFieldValue("remaks"),
       };
-      this.$emit("submitDrawer", data, this.index);
+      this.$emit("submitDrawer", data);
       // console.log("form" + this.form.getFieldValue("destination"));
-      this.onClose();
     },
     onChangeDistrict(value, selectedOptions) {
       this.destinationStr = selectedOptions.map((o) => o.label).join(", ");
+    },
+    onChangeDepartment(value, selectedOptions) {
+      this.departmentStr = selectedOptions.map((o) => o.label).join("/");
+      // console.log("selectedOptions:" + selectedOptions);
+    },
+    showModal() {
+      this.isModal = true;
+    },
+    handleOk() {
+      this.totalCount = this.selectedRowKeys.length;
+      this.isModal = false;
+    },
+    handleCancel() {
+      this.isModal = false;
     },
   },
 };

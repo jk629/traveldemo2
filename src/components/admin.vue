@@ -1,6 +1,8 @@
 <template>
   <a-form :form="form" @submit="handleSubmit">
-    <h1><span>旅游申请管理</span></h1>
+    <h1>
+      <span>旅游申请管理</span>
+    </h1>
     <a-form-item label="部门&组别">
       <a-cascader
         style="width:20%"
@@ -44,6 +46,20 @@
         <span>旅游申请一览</span>
       </h3>
     </div>
+    <detail
+      :visible="isVisible"
+      :department="departmentValue"
+      :departmentlb="departmentStr"
+      :travelstartday="travelstartdayValue"
+      :travelendday="travelenddayValue"
+      :destination="destinationValue"
+      :count="countValue"
+      :amount="amountValue"
+      :remaks="remaksValue"
+      :index="index"
+      :userType="true"
+      @closeDrawer="closeDrawer"
+    />
     <div class="island">
       <div style="margin-bottom: 16px">
         <a-space size="large">
@@ -56,11 +72,11 @@
       </div>
       <a-table
         :row-selection="{ selectedRowKeys : selectedRowKeys , onChange: onSelectChange }"
-        :columns="tableData.columns"
-        :data-source="tableData.dateSource"
-        :rowKey="record=>record.id"
+        :columns="columns"
+        :data-source="dateSource"
+        :rowKey="record=>record.index"
       >
-        <a slot="link" slot-scope="id" @click="handleEdit(id)">{{id}}</a>
+        <a slot="link" slot-scope="id,record" @click="handleEdit(record.index)">{{id}}</a>
       </a-table>
     </div>
   </a-form>
@@ -99,93 +115,104 @@ const residences = [
   },
 ];
 // table
-var tableData = {
-  columns: [
-    {
-      title: "状态",
-      dataIndex: "status",
-    },
-    {
-      title: "部门",
-      dataIndex: "department",
-    },
-    {
-      title: "识别ID",
-      dataIndex: "id",
-      scopedSlots: { customRender: "link" },
-    },
-    {
-      title: "人数",
-      dataIndex: "count",
-    },
-    {
-      title: "申请日",
-      dataIndex: "applydate",
-    },
-    {
-      title: "申请人",
-      dataIndex: "applicant",
-    },
-    {
-      title: "审批日",
-      dataIndex: "approvedate",
-    },
-    {
-      title: "审批人",
-      dataIndex: "approver",
-    },
-    {
-      title: "备注",
-      dataIndex: "remaks",
-    },
-  ],
-  dateSource: [
-    {
-      checked: false,
-      status: "终了",
-      department: "D1",
-      id: "1000001",
-      count: "10",
-      applydate: "2019-11-30",
-      applicant: "张三",
-      approvedate: "2019-12-03",
-      approver: "李四",
-      remaks: "同意",
-    },
-    {
-      checked: false,
-      status: "待审批",
-      department: "D2",
-      id: "1000004",
-      count: "15",
-      applydate: "2019-11-15",
-      applicant: "王五",
-      approvedate: "2019-12-10",
-      approver: "朱六",
-      remaks: "",
-    },
-  ],
-};
-
+var columns = [
+  {
+    title: "状态",
+    dataIndex: "status",
+  },
+  {
+    title: "部门&组别",
+    dataIndex: "department",
+  },
+  {
+    title: "识别ID",
+    dataIndex: "id",
+    scopedSlots: { customRender: "link" },
+  },
+  {
+    title: "人数",
+    dataIndex: "count",
+  },
+  {
+    title: "申请日",
+    dataIndex: "applydate",
+  },
+  {
+    title: "申请人",
+    dataIndex: "applicant",
+  },
+  {
+    title: "审批日",
+    dataIndex: "approvedate",
+  },
+  {
+    title: "审批人",
+    dataIndex: "approver",
+  },
+  {
+    title: "备注",
+    dataIndex: "remaks",
+  },
+];
+var dateSource = [
+  {
+    index: 0,
+    status: "终了",
+    department: "D1/T2",
+    departmentid: ["0", "02"],
+    id: "1000001",
+    count: "10",
+    applydate: "2019-11-30",
+    applicant: "张三",
+    approvedate: "2019-12-03",
+    approver: "李四",
+    remaks: "同意",
+    travelstartday: "2019-12-03",
+    travelendday: "2020-09-06",
+    destination: null,
+    amount: "",
+  },
+  {
+    index: 1,
+    status: "终了",
+    department: "D2/T3",
+    departmentid: ["1", "03"],
+    id: "1000002",
+    count: "10",
+    applydate: "2019-11-30",
+    applicant: "张三",
+    approvedate: "2019-12-03",
+    approver: "李四",
+    remaks: "同意",
+    travelstartday: "",
+    travelendday: "",
+    destination: null,
+    amount: "",
+  },
+];
+import detail from "./detail";
 export default {
   name: "admin",
-  props: {},
+  components: {
+    detail,
+  },
   data() {
     return {
       residences,
-      // formItemLayout: {
-      //   labelCol: {
-      //     xs: { span: 24 },
-      //     sm: { span: 8 },
-      //   },
-      //   wrapperCol: {
-      //     xs: { span: 24 },
-      //     sm: { span: 16 },
-      //   },
-      // },
-      tableData,
       loading: false,
       selectedRowKeys: [],
+      columns,
+      dateSource,
+      departmentValue: "",
+      departmentStr: "",
+      travelstartdayValue: "",
+      travelenddayValue: "",
+      destinationValue: "",
+      countValue: "",
+      amountValue: "",
+      remaksValue: "",
+      isVisible: false,
+      index: null,
     };
   },
   beforeCreate() {
@@ -217,8 +244,26 @@ export default {
         }
       });
     },
-    handleEdit(key) {
-      console.log(key + "!!!!!!!!!");
+    handleEdit(id) {
+      //通过key取得当前行数据
+      // const currentData = this.dateSource.filter(item => key === item.id)[0];
+      this.index = id;
+      this.departmentValue = this.dateSource[id].departmentid;
+      this.departmentStr = this.dateSource[id].department;
+      this.travelstartdayValue = this.dateSource[id].travelstartday;
+      this.travelenddayValue = this.dateSource[id].travelendday;
+      this.destinationValue = this.dateSource[id].destination;
+      this.countValue = this.dateSource[id].count;
+      this.amountValue = this.dateSource[id].amount;
+      this.remaksValue = this.dateSource[id].remaks;
+      this.isVisible = true;
+    },
+    showDrawer() {
+      this.isVisible = true;
+    },
+    closeDrawer() {
+      this.isVisible = false;
+      console.log("branch close !!!!!!!!!");
     },
   },
 };
