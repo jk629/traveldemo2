@@ -79,7 +79,7 @@ var dateSource = [
     index: 0,
     status: "终了",
     department: "D1/T2",
-    departmentid: ["0", "02"],
+    departmentid: ['0', '02'],
     id: "1000001",
     count: "10",
     applydate: "2019-11-30",
@@ -136,7 +136,6 @@ export default {
     handleEdit(id) {
       //通过key取得当前行数据
       // const currentData = this.dateSource.filter(item => key === item.id)[0];
-      this.newDrawer();
       this.index = id;
       this.departmentValue = this.dateSource[id].departmentid;
       this.departmentStr = this.dateSource[id].department;
@@ -146,7 +145,7 @@ export default {
       this.countValue = this.dateSource[id].count;
       this.amountValue = this.dateSource[id].amount;
       this.remaksValue = this.dateSource[id].remaks;
-      this.isVisible = true;
+      this.showDrawer();
     },
     // updTableData(tbd) {
     //   this.tableData = tbd;

@@ -5,6 +5,7 @@
     :visible="visible"
     :body-style="{ paddingBottom: '80px' }"
     @close="onClose"
+    :destroyOnClose="true"
   >
     <div>
       <a-form :form="form" layout="vertical" :hide-required-mark="isHideRequired">
@@ -20,6 +21,7 @@
                   'department',
                   { 
                     initialValue:department,
+                    rules: [{ required: true, message: 'Please select a department' }],
                   },
                 ]"
               />
@@ -116,7 +118,6 @@
                   'remaks',
                   {
                     initialValue:remaks,
-                    rules: [{ required: true, message: 'Please enter something' }],
                   },
                 ]"
                 :disabled="userType"
@@ -339,23 +340,26 @@ export default {
       this.selectedRowKeys = selectedRowKeys;
     },
     onSave() {
-      this.form.validateFieldsAndScroll((err, values) => {
+      this.form.validateFields((err, values) => {
         if (!err) {
           console.log("Received values of form: ", values);
+          let data = {
+            index: this.index,
+            departmentid: this.form.getFieldValue("department"),
+            department: this.departmentStr
+              ? this.departmentStr
+              : this.departmentlb,
+            travelstartday: this.form.getFieldValue("travelstartday"),
+            travelendday: this.form.getFieldValue("travelendday"),
+            destination: this.form.getFieldValue("destination"),
+            count: this.totalCount,
+            amount: this.form.getFieldValue("amount"),
+            remaks: this.form.getFieldValue("remaks"),
+          };
+          this.$emit("submitDrawer", data);
         }
       });
-      let data = {
-        index: this.index,
-        departmentid: this.form.getFieldValue("department"),
-        department: this.departmentStr ? this.departmentStr : this.departmentlb,
-        travelstartday: this.form.getFieldValue("travelstartday"),
-        travelendday: this.form.getFieldValue("travelendday"),
-        destination: this.form.getFieldValue("destination"),
-        count: this.totalCount,
-        amount: this.form.getFieldValue("amount"),
-        remaks: this.form.getFieldValue("remaks"),
-      };
-      this.$emit("submitDrawer", data);
+
       // console.log("form" + this.form.getFieldValue("destination"));
     },
     onChangeDistrict(value, selectedOptions) {
