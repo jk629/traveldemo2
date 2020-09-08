@@ -356,6 +356,8 @@ export default {
             amount: this.form.getFieldValue("amount"),
             remaks: this.form.getFieldValue("remaks"),
           };
+          this.destinationStr = "";
+          
           this.$emit("submitDrawer", data);
         }
       });

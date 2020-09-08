@@ -96,7 +96,7 @@ var dateSource = [
     index: 1,
     status: "终了",
     department: "D2/T3",
-    departmentid: ["1", "03"],
+    departmentid: ['1', '03'],
     id: "1000002",
     count: "10",
     applydate: "2019-11-30",
@@ -106,7 +106,7 @@ var dateSource = [
     remaks: "同意",
     travelstartday: "",
     travelendday: "",
-    destination: null,
+    destination: ['1', '10','100'],
     amount: "",
   },
 ];
@@ -170,7 +170,8 @@ export default {
       console.log("branch close !!!!!!!!!");
     },
     submitDrawer(data) {
-      if (data.index) {
+      console.log("index:"+data.index)
+      if (data.index != null) {
         this.dateSource[data.index].departmentid = data.departmentid;
         this.dateSource[data.index].department = data.department;
         this.dateSource[data.index].travelstartday = data.travelstartday;
